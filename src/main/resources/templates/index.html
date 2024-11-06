@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Animal App</title>
+</head>
+<body>
+
+<h1>Animals</h1>
+
+<button onclick="getAnimals()">Get Animals</button>
+<br><br>
+<div id="animals"></div>
+
+<h2>Add Animal</h2>
+<input type="text" id="name" placeholder="Name">
+<input type="number" id="age" placeholder="Age">
+<input type="text" id="type" placeholder="Type">
+<button onclick="addAnimal()">Add</button>
+
+<h2>Update Animal</h2>
+<input type="number" id="updateId" placeholder="ID">
+<input type="text" id="updateName" placeholder="Name">
+<input type="number" id="updateAge" placeholder="Age">
+<input type="text" id="updateType" placeholder="Type">
+<button onclick="updateAnimal()">Update</button>
+
+
+<h2>Delete Animal</h2>
+<input type="number" id="deleteId" placeholder="ID">
+<button onclick="deleteAnimal()">Delete</button>
+
+<script>
+async function getAnimals() {
+    const response = await fetch('/get');
+    const animals = await response.json();
+    let html = '';
+    animals.forEach(animal => {
+        html += `<p>ID: ${animal.id}, Name: ${animal.name}, Age: ${animal.age}, Type: ${animal.type}</p>`;
+    });
+    document.getElementById('animals').innerHTML = html;
+}
+
+async function addAnimal() {
+    const name = document.getElementById('name').value;
+    const age = document.getElementById('age').value;
+    const type = document.getElementById('type').value;
+    const response = await fetch('/post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, age, type })
+    });
+    const data = await response.text();
+    alert(data); 
+}
+
+
+async function updateAnimal() {
+    const id = document.getElementById('updateId').value;
+    const name = document.getElementById('updateName').value;
+    const age = document.getElementById('updateAge').value;
+    const type = document.getElementById('updateType').value;
+    const response = await fetch(`/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, age, type })
+    });
+    if (response.ok) {
+        alert('Animal updated successfully!');
+    } else {
+        alert('Error updating animal.');
+    }
+    getAnimals();
+}
+
+
+async function deleteAnimal() {
+    const id = document.getElementById('deleteId').value;
+    await fetch(`/del/${id}`, { method: 'DELETE' });
+    getAnimals();
+
+}
+</script>
+
+</body>
+</html>
